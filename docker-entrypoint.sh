@@ -205,6 +205,7 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ] || [ "${NEXTCLOUD_UP
                 if [ -n "${NEXTCLOUD_ADMIN_USER+x}" ] && [ -n "${NEXTCLOUD_ADMIN_PASSWORD+x}" ]; then
                     # shellcheck disable=SC2016
                     install_options='-n --admin-user "$NEXTCLOUD_ADMIN_USER" --admin-pass "$NEXTCLOUD_ADMIN_PASSWORD"'
+
                     if [ -n "${NEXTCLOUD_DATA_DIR+x}" ]; then
                         # shellcheck disable=SC2016
                         install_options=$install_options' --data-dir "$NEXTCLOUD_DATA_DIR"'
@@ -283,7 +284,9 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ] || [ "${NEXTCLOUD_UP
 
                 run_path post-upgrade
             fi
-
+            if [ -n "${NEXTCLOUD_ADMIN_EMAIL+x}" ]; then
+                run_as 'php /var/www/html/occ user:setting' "$NEXTCLOUD_ADMIN_USER" settings email "$NEXTCLOUD_ADMIN_EMAIL"
+            fi
             echo "Initializing finished"
         fi
 
